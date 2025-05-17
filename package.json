@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "npx playwright test",
-    "testui": "npx playwright test --ui"
+    "testui": "npx playwright test --ui",
+    "reportAwesome": "npx allure awesome ./allure-results --single-file",
+    "reportClassic": "npx allure classic ./allure-results --single-file"
   },
   "keywords": [],
   "author": "",
@@ -16,7 +18,7 @@
     "@types/node": "^22.15.17"
   },
   "dependencies": {
-    "allure": "^3.0.0-beta.12",
-    "allure-playwright": "^3.2.2"
+    "allure": "^3.0.0-beta.10",
+    "allure-playwright": "^3.2.1"
   }
 }

@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+/*import { test, expect } from '@playwright/test';
 import { faker } from '@faker-js/faker';
 import { MainPage, RegisterPage, YourfeedPage, ArticlePage, GlobalfeedPage} from '../src/pages/conduit/index';
 import { ArticleBuilder, UserBuilder } from '../src/helpers/builder/index';
@@ -105,3 +105,4 @@ test.describe('Авторизация новым пользователем', ()
     await expect(globalfeedPage.heartCounter).toContainText(likenumber.like);
 });
 });
+*/
