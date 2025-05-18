@@ -7,13 +7,13 @@
 - [apichallenges.herokuapp](https://apichallenges.herokuapp.com/) 
 
 ### Проект реализован с использованием
-[![Playwright](https://img.shields.io/badge/-Playwright-45ba4b?logo=playwright)](https://playwright.dev)
-[![JavaScript](https://img.shields.io/badge/-JavaScript-F7DF1E?logo=javascript&logoColor=black)](https://developer.mozilla.org/ru/docs/Web/JavaScript)
-[![GitHub Actions](https://img.shields.io/badge/-GitHub_Actions-2088FF?logo=github-actions)](https://github.com/features/actions)
-[![Jenkins](https://img.shields.io/badge/-Jenkins-D24939?logo=jenkins)](https://www.jenkins.io)
-[![Allure](https://img.shields.io/badge/-Allure_Report-FF6A00?logo=allure)](https://docs.qameta.io/allure/)
-[![Telegram](https://img.shields.io/badge/-Telegram-26A5E4?logo=telegram)](https://telegram.org)
-
+[<img src="https://playwright.dev/img/playwright-logo.svg" width="24" title="Playwright">](https://playwright.dev)
+[<img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/javascript/javascript-original.svg" width="24" title="JavaScript">](https://developer.mozilla.org/ru/docs/Web/JavaScript)
+[<img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="24" title="GitHub Actions">](https://github.com/features/actions)
+[<img src="https://www.jenkins.io/images/logos/jenkins/jenkins.svg" width="24" title="Jenkins">](https://www.jenkins.io)
+[<img src="https://avatars.githubusercontent.com/u/5879127?s=200&v=4" width="24" title="Allure">](https://docs.qameta.io/allure/)
+[<img src="https://allure.autotests.cloud/favicon.ico" width="24" title="Allure TestOps">](https://allure.autotests.cloud)  
+[<img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" width="24" title="Telegram">](https://telegram.org)
 
 - **Playwright** – современный фреймворк для автоматизации тестирования 
 - **JavaScript** – язык написания тестов 
