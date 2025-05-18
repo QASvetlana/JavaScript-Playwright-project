@@ -35,6 +35,8 @@
      ```
 
 #### Запуск автотестов с помощью Github Actions
+<img src="src/images/github actions.png" width="660" height="400"/></a>
+
 #### Отчет о тестировании формируется с помощью allure
 #### Отчет о прохождении автотестов приходит в Telegram
 
