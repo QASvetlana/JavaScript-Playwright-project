@@ -4,9 +4,9 @@
 
 
 ## В проекте собраны автотесты для:
-- [x] https://realworld.qa.guru/
-- [x] [apichallenges.herokuapp.com](https://apichallenges.herokuapp.com/)
-- [x] https://realworld.qa.guru/  
+- [realworld.qa.guru](https://realworld.qa.guru/)
+- [academybugs](https://academybugs.com/find-bugs/)
+- [apichallenges.herokuapp](https://apichallenges.herokuapp.com/) 
 
 ## 🛠 Технологии
 
