@@ -1,6 +1,6 @@
 # Проект автоматизации тестирования с использованием **Playwright** + **JavaScript**
 
-![Playwright Logo](https://playwright.dev/img/playwright-logo.svg)
+# <img src="https://playwright.dev/img/playwright-logo.svg" width="30" height="30" alt=""> JavaScript Playwright Tests
 
 
 ## В проекте собраны автотесты для:
