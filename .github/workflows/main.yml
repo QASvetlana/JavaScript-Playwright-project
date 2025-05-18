@@ -31,34 +31,9 @@ jobs:
       
       # Create notifications directory
       - name: Prepare notifications directory
-        run: mkdir -p notifications
-      
-      # Download Allure Notifications
-      - name: Download Allure Notifications
         run: |
+          mkdir -p notifications
           wget https://github.com/qa-guru/allure-notifications/releases/download/4.9.0/allure-notifications-4.9.0.jar -O notifications/allure-notifications.jar
-      
-      # Create config file
-      - name: Create config file
-        run: |
-          cat <<EOF > notifications/config.json
-          {
-            "base": {
-              "project": "JS PW QA",
-              "environment": "prod",
-              "comment": "smoke tests",
-              "reportLink": "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/allure-history",
-              "language": "en",
-              "allureFolder": "allure-report",
-              "enableChart": true
-            },
-            "telegram": {
-              "token": "${{ secrets.TELEGRAM_BOT_TOKEN }}",
-              "chat": "${{ secrets.TELEGRAM_CHAT_ID }}",
-              "replyTo": ""
-            }
-          }
-          EOF
       
       # Run tests with Allure reporting
       - name: Run Playwright tests with Allure
@@ -70,42 +45,41 @@ jobs:
         env:
           ALLURE_RESULTS: './allure-results'
       
-      # Upload test results
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-results
-          path: |
-            test-results
-            allure-results
-          retention-days: 20
-      
-      # Checkout gh-pages for history
-      - uses: actions/checkout@v4
-        if: always()
-        with:
-          ref: gh-pages
-          path: gh-pages
-      
       # Generate Allure report
-      - uses: simple-elf/allure-report-action@master
+      - name: Generate Allure report
         if: always()
-        id: allure-report
-        with:
-          allure_results: allure-results
-          gh_pages: gh-pages
-          allure_report: allure-report
-          allure_history: allure-history
-          keep_reports: 20
+        run: |
+          allure generate allure-results -o allure-report --clean
       
-      # Deploy report
-      - name: Deploy Allure report
+      # Prepare notification data
+      - name: Prepare notification data
         if: always()
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: gh-pages
-          publish_dir: allure-history
+        run: |
+          # Create config file
+          cat <<EOF > config.json
+          {
+            "base": {
+              "project": "JS PW QA",
+              "environment": "prod",
+              "comment": "smoke tests",
+              "reportLink": "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/allure-report",
+              "language": "en",
+              "allureFolder": "allure-report",
+              "enableChart": true
+            },
+            "telegram": {
+              "token": "${{ secrets.TELEGRAM_BOT_TOKEN }}",
+              "chat": "${{ secrets.TELEGRAM_CHAT_ID }}",
+              "replyTo": ""
+            }
+          }
+          EOF
+          
+          # Create duration file
+          echo "{\"time\": {\"duration\": ${{ env.DURATION_SECONDS }}}" > duration.json
+          
+          # Copy summary.json from results
+          cp allure-results/summary.json . || echo "{}" > summary.json
       
       # Setup Java
       - name: Setup Java 17
@@ -115,17 +89,22 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
       
-      # Prepare duration file
-      - name: Prepare duration data
-        if: always()
-        run: |
-          echo "{\"time\": {\"duration\": ${{ env.DURATION_SECONDS }}}" > notifications/duration.json
-      
-      # Send notification
+      # Send notification (updated command)
       - name: Send Telegram notification
         if: always()
         run: |
-          java -jar notifications/allure-notifications.jar \
-            -c notifications/config.json \
-            -d notifications/duration.json \
-            -s allure-results/summary.json
+          java -DconfigFile=config.json \
+               -DdurationFile=duration.json \
+               -DsummaryFile=summary.json \
+               -jar notifications/allure-notifications.jar
+      
+      # Upload artifacts
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: |
+            test-results
+            allure-results
+            allure-report
+          retention-days: 20
