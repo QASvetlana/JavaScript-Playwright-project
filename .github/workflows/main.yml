@@ -2,10 +2,6 @@ name: pw tests with allure
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main, dev1]
-  pull_request:
-    branches: [main, dev1]
 
 permissions:
   contents: write  # Нужно для деплоя в gh-pages
