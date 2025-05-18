@@ -1,4 +1,4 @@
-name: pw tests with allure
+name: Playwright Tests with Allure Report
 
 on:
   workflow_dispatch:
@@ -9,101 +9,88 @@ permissions:
   id-token: write
 
 jobs:
-  e2eTests:
+  e2eTest:
+    timeout-minutes: 60
     runs-on: ubuntu-latest
-    
     steps:
       # Checkout code
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
       
       # Setup Node.js
-      - name: Install Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: lts/*
       
       # Install dependencies
       - name: Install dependencies
-        run: npm install
+        run: npm ci
       
       # Install Playwright
       - name: Install Playwright
         run: npx playwright install --with-deps
       
-      # Run tests
-      - name: Run Playwright tests
-        run: npx playwright test
+      # Run tests with Allure reporting
+      - name: Run Playwright tests with Allure
+        run: |
+          allurectl watch -- npx playwright test
+        env:
+          ALLURE_RESULTS: './allure-results'
       
-      # Upload test results
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
+      # Upload Playwright test results
+      - uses: actions/upload-artifact@v4
         if: always()
-        continue-on-error: true
         with:
-          name: test-results
+          name: playwright-test-results
           path: test-results
           retention-days: 20
       
       # Upload Allure results
-      - name: Upload Allure results
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         if: always()
-        continue-on-error: true
         with:
           name: allure-results
           path: allure-results
           retention-days: 20
       
-      # Checkout gh-pages branch
-      - name: Checkout gh-pages branch
-        uses: actions/checkout@v4
+      # Checkout gh-pages branch for history
+      - uses: actions/checkout@v4
         if: always()
-        continue-on-error: true
         with:
           ref: gh-pages
           path: gh-pages
-          token: ${{ secrets.GITHUB_TOKEN }}
-      
-      # Verify Allure results exist
-      - name: Check Allure results
-        run: |
-          ls -la allure-results/
-          echo "Files count: $(find allure-results/ -type f | wc -l)"
       
       # Generate Allure report
-      - name: Generate Allure report
-        run: |
-          # Install Allure CLI if not exists
-          if ! command -v allure &> /dev/null; then
-            echo "Installing Allure CLI..."
-            curl -o allure-2.14.0.tgz -sL https://github.com/allure-framework/allure2/releases/download/2.14.0/allure-2.14.0.tgz
-            tar -zxvf allure-2.14.0.tgz -C /usr/local --strip-components=1
-          fi
-          
-          # Generate report
-          allure generate allure-results -o gh-pages/allure-report --clean
-          
-          # Create history
-          mkdir -p gh-pages/allure-history
-          cp -r gh-pages/allure-report gh-pages/allure-history/$(date +%Y%m%d%H%M%S)
-          
-          # Create latest link
-          ln -sfn $(date +%Y%m%d%H%M%S) gh-pages/allure-history/latest
-      
-      # Verify generated report
-      - name: Check generated report
-        run: |
-          ls -la gh-pages/allure-report/
-          ls -la gh-pages/allure-history/
-      
-      # Deploy to GitHub Pages
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+      - uses: simple-elf/allure-report-action@master
         if: always()
+        id: allure-report
+        with:
+          allure_results: allure-results
+          gh_pages: gh-pages
+          allure_report: allure-report
+          allure_history: allure-history
+          keep_reports: 20
+      
+      # Deploy report to GitHub Pages
+      - name: Deploy Allure report
+        if: always()
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: ./gh-pages
-          force_orphan: true
-          keep_files: false
+          publish_dir: allure-history
+      
+      # Setup Java for notifications
+      - name: Setup Java 17
+        if: always()
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      
+      # Send Telegram notification
+      - name: Send Telegram notification
+        if: always()
+        run: |
+          export TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}
+          export TELEGRAM_CHAT_ID=${{ secrets.TELEGRAM_CHAT_ID }}
+          java -DconfigFile=notifications/telegram.json -jar notifications/allure-notifications-4.9.0.jar
