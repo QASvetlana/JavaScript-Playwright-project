@@ -1,110 +1,108 @@
-name: Playwright Tests with Allure Report
-
+# Называем workflow
+name: pw tests with allure
 on:
   workflow_dispatch:
-
+  push:
+    branches: [ main, dev1 ]
+  pull_request:
+    branches: [ main, dev1 ]
 permissions:
-  contents: write
-  pages: write
-  id-token: write
-
+  contents: write  # Нужно для деплоя в gh-pages
 jobs:
-  e2eTest:
+  test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-      # Checkout code
       - uses: actions/checkout@v4
-      
-      # Setup Node.js
       - uses: actions/setup-node@v4
         with:
           node-version: lts/*
-      
-      # Install dependencies
       - name: Install dependencies
         run: npm ci
-      
-      # Install Playwright
-      - name: Install Playwright
+      - name: Install Playwright Browsers
         run: npx playwright install --with-deps
-      
-      # Create notifications directory
-      - name: Prepare notifications directory
-        run: |
-          mkdir -p notifications
-          wget https://github.com/qa-guru/allure-notifications/releases/download/4.9.0/allure-notifications-4.9.0.jar -O notifications/allure-notifications.jar
-      
-      # Run tests with Allure reporting
-      - name: Run Playwright tests with Allure
-        run: |
-          start_time=$(date +%s)
-          allurectl watch -- npx playwright test || true
-          end_time=$(date +%s)
-          echo "DURATION_SECONDS=$((end_time - start_time))" >> $GITHUB_ENV
-        env:
-          ALLURE_RESULTS: './allure-results'
-      
-      # Generate Allure report
-      - name: Generate Allure report
-        if: always()
-        run: |
-          allure generate allure-results -o allure-report --clean
-      
-      # Prepare notification data
-      - name: Prepare notification data
-        if: always()
-        run: |
-          # Create config file
-          cat <<EOF > config.json
-          {
-            "base": {
-              "project": "JS PW QA",
-              "environment": "prod",
-              "comment": "smoke tests",
-              "reportLink": "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/allure-report",
-              "language": "en",
-              "allureFolder": "allure-report",
-              "enableChart": true
-            },
-            "telegram": {
-              "token": "${{ secrets.TELEGRAM_BOT_TOKEN }}",
-              "chat": "${{ secrets.TELEGRAM_CHAT_ID }}",
-              "replyTo": ""
-            }
-          }
-          EOF
-          
-          # Create duration file
-          echo "{\"time\": {\"duration\": ${{ env.DURATION_SECONDS }}}" > duration.json
-          
-          # Copy summary.json from results
-          cp allure-results/summary.json . || echo "{}" > summary.json
-      
-      # Setup Java
-      - name: Setup Java 17
-        if: always()
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-      
-      # Send notification (updated command)
-      - name: Send Telegram notification
-        if: always()
-        run: |
-          java -DconfigFile=config.json \
-               -DdurationFile=duration.json \
-               -DsummaryFile=summary.json \
-               -jar notifications/allure-notifications.jar
-      
-      # Upload artifacts
+      - name: Run Playwright tests
+        run: npx playwright test
+
+        # сохраняем отчет pw
       - uses: actions/upload-artifact@v4
         if: always()
+        continue-on-error: true
         with:
           name: test-results
-          path: |
-            test-results
-            allure-results
-            allure-report
+          path: test-results
           retention-days: 20
+
+      # сохраняем отчет allure
+      - uses: actions/upload-artifact@v4
+        if: always()
+        continue-on-error: true
+        with:
+          name: allure-results
+          path: allure-results
+          retention-days: 20
+
+      # забираем результаты предыдущего запуска отчета allure
+      - uses: actions/checkout@v4
+        if: always()
+        continue-on-error: true
+        with:
+          ref: gh-pages
+          path: gh-pages
+
+      - name: Generate Allure Report
+        if: always()
+        uses: simple-elf/allure-report-action@master
+        id: allure-report
+        with:
+          allure_results: allure-results
+          allure_report: allure-report
+          allure_history: allure-history
+          keep_reports: 20
+
+        # Формируем из allure-results отчет allure-report
+      - name: Deploy report to GitHub Pages
+        if: always()
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: allure-history
+          publish_branch: gh-pages
+
+      - name: Install allurectl
+        run: |
+          curl -o allurectl -L "https://github.com/allure-framework/allurectl/releases/latest/download/allurectl_linux_amd64"
+          chmod +x allurectl
+          sudo mv allurectl /usr/local/bin/
+
+      - name: Parse Allure summary
+        id: parse_summary
+        if: always()
+        run: |
+          SUMMARY_FILE="allure-report/widgets/summary.json"
+          if [ -f "$SUMMARY_FILE" ]; then
+            PASSED=$(jq '.statistic.passed' $SUMMARY_FILE)
+            FAILED=$(jq '.statistic.failed' $SUMMARY_FILE)
+            SKIPPED=$(jq '.statistic.skipped' $SUMMARY_FILE)
+            TOTAL=$(jq '.statistic.total' $SUMMARY_FILE)
+            echo "PASSED=$PASSED" >> $GITHUB_ENV
+            echo "FAILED=$FAILED" >> $GITHUB_ENV
+            echo "SKIPPED=$SKIPPED" >> $GITHUB_ENV
+            echo "TOTAL=$TOTAL" >> $GITHUB_ENV
+          fi
+      
+      - name: Notify Telegram
+        if: always()
+        run: |
+          STATUS=${{ job.status }}
+          MESSAGE=" *Прогон тестов завершен*%0A\
+          Статус: *$STATUS*%0A\
+          📈 Всего пройдено: *$TOTAL*%0A\
+          ✅ Успешные: *$PASSED*%0A\
+          🛑 Провалено: *$FAILED*%0A\
+          ⚠️ Пропущено: *$SKIPPED*%0A\
+            ⛓️ [Allure отчет](https://QASvetlana.github.io/JavaScript-Playwright-project/)
+            curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
+            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+            -d parse_mode=Markdown \
+            -d text="$MESSAGE"
