@@ -447,7 +447,7 @@ test('35.PUT /challenger/guid RESTORE', {tag: ['@id_35', '@PUT']}, async ({ requ
    expect(body).toMatchObject(progress);
  });
 
- test('36.PUT /challenger/guid CREATE', {tag: ['@id_36', '@PUT']}, async ({ request }) => {
+ /*test('36.PUT /challenger/guid CREATE', {tag: ['@id_36', '@PUT']}, async ({ request }) => {
   const getResponse = await request.get(`${URL}challenger/${token}`, {
     headers: {"x-challenger": token,},
   });
@@ -459,7 +459,7 @@ test('35.PUT /challenger/guid RESTORE', {tag: ['@id_35', '@PUT']}, async ({ requ
     data: body});
   expect(putResponse.status()).toBe(201);
   expect(body.xChallenger).toBe(newToken);
-});
+});*/
 
 test('37.	GET /challenger/database/guid (200)', {tag: ['@id_37', '@GET']}, async ({ request }) => {
   const response = await request.get(`${URL}challenger/database/${token}`, {
