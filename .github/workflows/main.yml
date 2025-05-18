@@ -32,32 +32,24 @@ jobs:
       # Run tests with Allure reporting
       - name: Run Playwright tests with Allure
         run: |
-          set -e
           start_time=$(date +%s)
           allurectl watch -- npx playwright test || true
           end_time=$(date +%s)
-          duration=$((end_time - start_time))
-          echo "DURATION_SECONDS=$duration" >> $GITHUB_ENV
+          echo "DURATION_SECONDS=$((end_time - start_time))" >> $GITHUB_ENV
         env:
           ALLURE_RESULTS: './allure-results'
       
-      # Upload Playwright test results
+      # Upload test results
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: playwright-test-results
-          path: test-results
+          name: test-results
+          path: |
+            test-results
+            allure-results
           retention-days: 20
       
-      # Upload Allure results
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: allure-results
-          path: allure-results
-          retention-days: 20
-      
-      # Checkout gh-pages branch for history
+      # Checkout gh-pages for history
       - uses: actions/checkout@v4
         if: always()
         with:
@@ -75,7 +67,7 @@ jobs:
           allure_history: allure-history
           keep_reports: 20
       
-      # Deploy report to GitHub Pages
+      # Deploy report
       - name: Deploy Allure report
         if: always()
         uses: peaceiris/actions-gh-pages@v4
@@ -84,7 +76,7 @@ jobs:
           publish_branch: gh-pages
           publish_dir: allure-history
       
-      # Setup Java for notifications
+      # Setup Java
       - name: Setup Java 17
         if: always()
         uses: actions/setup-java@v3
@@ -92,18 +84,31 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
       
-      # Prepare duration file for Allure Notifications
-      - name: Prepare duration file
+      # Prepare report URL and duration
+      - name: Prepare notification data
         if: always()
         run: |
+          # Generate report URL
+          REPORT_URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/allure-history"
+          
+          # Create duration file
           echo "{\"time\": {\"duration\": ${{ env.DURATION_SECONDS }}}" > duration.json
+          
+          # Update telegram.json with actual values
           mkdir -p notifications
+          jq --arg token "${{ secrets.TELEGRAM_BOT_TOKEN }}" \
+             --arg chat "${{ secrets.TELEGRAM_CHAT_ID }}" \
+             --arg url "$REPORT_URL" \
+             '.telegram.token = $token | 
+              .telegram.chat = $chat |
+              .base.reportLink = $url' \
+             notifications/telegram.json > tmp.json && mv tmp.json notifications/telegram.json
+          
+          # Copy duration file
           cp duration.json notifications/
       
-      # Send Telegram notification
+      # Send notification
       - name: Send Telegram notification
         if: always()
         run: |
-          export TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}
-          export TELEGRAM_CHAT_ID=${{ secrets.TELEGRAM_CHAT_ID }}
-          java -DconfigFile=notifications/telegram.json -jar notifications/allure-notifications-4.9.0.jar
+          java -jar notifications/allure-notifications-4.9.0.jar
