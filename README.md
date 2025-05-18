@@ -1,7 +1,7 @@
 # <img src="https://playwright.dev/img/playwright-logo.svg" width="30" height="30" alt=""> Проект автоматизации тестирования с использованием **Playwright** + **JavaScript**
 
 
-## В проекте собраны автотесты для:
+### В проекте собраны автотесты для:
 - [realworld.qa.guru](https://realworld.qa.guru/)
 - [academybugs](https://academybugs.com/find-bugs/)
 - [apichallenges.herokuapp](https://apichallenges.herokuapp.com/) 
