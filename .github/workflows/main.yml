@@ -32,7 +32,12 @@ jobs:
       # Run tests with Allure reporting
       - name: Run Playwright tests with Allure
         run: |
-          allurectl watch -- npx playwright test
+          set -e
+          start_time=$(date +%s)
+          allurectl watch -- npx playwright test || true
+          end_time=$(date +%s)
+          duration=$((end_time - start_time))
+          echo "DURATION_SECONDS=$duration" >> $GITHUB_ENV
         env:
           ALLURE_RESULTS: './allure-results'
       
@@ -86,6 +91,14 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+      
+      # Prepare duration file for Allure Notifications
+      - name: Prepare duration file
+        if: always()
+        run: |
+          echo "{\"time\": {\"duration\": ${{ env.DURATION_SECONDS }}}" > duration.json
+          mkdir -p notifications
+          cp duration.json notifications/
       
       # Send Telegram notification
       - name: Send Telegram notification
