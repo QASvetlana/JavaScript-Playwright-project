@@ -1,11 +1,12 @@
 const { test, expect } = require('@playwright/test');
 import { ChallengerService } from '../src/service/challenger.service';
-const { title } = require('process');
+import { ChallengesService } from '../src/service/challenges.service';
+//const { title } = require('process');
 import { faker } from '@faker-js/faker';
 
 test.describe("API challenge", () => {
     let URL = "https://apichallenges.herokuapp.com/";
-    let token, challengerService;
+    let token, challengerService, challengesService;
   
     test.beforeAll(async ({ request }) => {
       challengerService = new ChallengerService(request);
@@ -18,13 +19,11 @@ test.describe("API challenge", () => {
     });
 
     test("2.Получить список заданий get /challenges", {tag: ['@id_2', '@GET']}, async ({ request }) => {
-        let response = await request.get(`${URL}challenges`, {
-          headers: { "x-challenger": token,},
-        });
+        challengesService = new ChallengesService(request);
+        let response = await challengesService.get(token);
         let body = await response.json();
-        let headers = await response.headers();
         expect(response.status()).toBe(200);
-        expect(headers).toEqual(expect.objectContaining({ "x-challenger": token }));
+        expect(response.headers()).toEqual(expect.objectContaining({ "x-challenger": token }));
         expect(body.challenges.length).toBe(59);
       });
 
