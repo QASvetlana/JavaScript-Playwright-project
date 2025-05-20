@@ -1,13 +1,15 @@
 const { test, expect } = require('@playwright/test');
+import { ChallengerService } from '../src/service/challenger.service';
 const { title } = require('process');
 import { faker } from '@faker-js/faker';
 
 test.describe("API challenge", () => {
     let URL = "https://apichallenges.herokuapp.com/";
-    let token;
+    let token, challengerService;
   
     test.beforeAll(async ({ request }) => {
-      let response = await request.post(`${URL}challenger`);
+      challengerService = new ChallengerService(request);
+      const response = await challengerService.post();
       let headers = await response.headers();
       token = headers["x-challenger"];
       expect(headers).toEqual(
