@@ -1,4 +1,4 @@
-/*import { test, expect } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import { MainPage, ProductPage, CartPage, FindBugsPage } from '../src/pages/academybugs/index';
 
 const URL_UI = 'https://academybugs.com/find-bugs/';
@@ -49,4 +49,4 @@ test.describe('Поиск 5 багов на сайте академии баго
     await productPage.goToManufacterer();
     await expect(findBugsPage.modalWindowAboutBug).toContainText('What did you find out?');
   });
-});*/
+});
