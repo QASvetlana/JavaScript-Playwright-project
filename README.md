@@ -46,10 +46,11 @@
 <img src="src/images/telegram.jpg" width="270" height="480"/></a>
 
 #### Альтернативный запуск автотестов с помощью Jenkins
-
+<img src="src/images/Jenkins.png" width="690" height="370"/></a>
 
 #### Настроена интеграция с Allure TestOps
-
+<img src="src/images/Testops.png" width="690" height="270"/></a>
+<img src="src/images/Testops1.png" width="690" height="370"/></a>
    
 
 
