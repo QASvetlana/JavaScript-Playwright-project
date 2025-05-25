@@ -44,6 +44,12 @@
 
 #### Отчет о прохождении автотестов приходит в Telegram
 <img src="src/images/telegram.jpg" width="270" height="480"/></a>
+
+#### Альтернативный запуск автотестов с помощью Jenkins
+
+
+#### Настроена интеграция с Allure TestOps
+
    
 
 
