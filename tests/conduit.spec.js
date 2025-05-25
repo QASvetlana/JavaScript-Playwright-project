@@ -73,7 +73,7 @@ test.describe('Авторизация новым пользователем', ()
 });
 
 
-/* test('Пользователь может поставить статье лайк', async ({ 
+ test('Пользователь может поставить статье лайк', async ({ 
   page,
  }) => {
     const yourfeedPage = new YourfeedPage(page);
@@ -103,5 +103,5 @@ test.describe('Авторизация новым пользователем', ()
     await yourfeedPage.gotoGlobalField();
     await globalfeedPage.clicktoheartButton();
     await expect(globalfeedPage.heartCounter).toContainText(likenumber.like);
-});*/
+});
 });
