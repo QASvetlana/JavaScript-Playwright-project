@@ -38,6 +38,7 @@
 <img src="src/images/github actions.png" width="690" height="370"/></a>
 
 #### Отчет о тестировании формируется с помощью allure
+[Ссылка на отчет](https://qasvetlana.github.io/JavaScript-Playwright-project/)
 <img src="src/images/allure.png" width="690" height="370"/></a>
 
 <img src="src/images/allure2.png" width="690" height="370"/></a>
