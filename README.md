@@ -1,63 +1,94 @@
-# <img src="https://playwright.dev/img/playwright-logo.svg" width="30" height="30" alt=""> Проект автоматизации тестирования с использованием **Playwright** + **JavaScript**
+# <img src="https://playwright.dev/img/playwright-logo.svg" width="30" height="30" alt=""> UI- и API-автотесты на Playwright + JavaScript
 
+![Playwright](https://img.shields.io/badge/Playwright-2EAD33?style=flat-square&logo=playwright&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
+![Allure](https://img.shields.io/badge/Allure_Report-FF6B35?style=flat-square)
+![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat-square&logo=github-actions&logoColor=white)
 
-### В проекте собраны автотесты для:
-- [realworld.qa.guru](https://realworld.qa.guru/)
-- [academybugs](https://academybugs.com/find-bugs/)
-- [apichallenges.herokuapp](https://apichallenges.herokuapp.com/) 
+37 автотестов для трёх публичных стендов: UI-сценарии на Page Object, API-тесты через сервисный слой, генерация данных на faker, прогон в GitHub Actions, отчёт Allure в GitHub Pages и уведомление в Telegram.
 
-### Проект реализован с использованием
-[<img src="https://playwright.dev/img/playwright-logo.svg" width="24" title="Playwright">](https://playwright.dev) [<img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/javascript/javascript-original.svg" width="24" title="JavaScript">](https://developer.mozilla.org/ru/docs/Web/JavaScript) [<img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="24" title="GitHub Actions">](https://github.com/features/actions) [<img src="https://www.jenkins.io/images/logos/jenkins/jenkins.svg" width="24" title="Jenkins">](https://www.jenkins.io) [<img src="https://avatars.githubusercontent.com/u/5879127?s=200&v=4" width="24" title="Allure Report">](https://docs.qameta.io/allure/) [<img src="https://allure.autotests.cloud/favicon.ico" width="24" title="Allure TestOps">](https://allure.autotests.cloud) [<img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" width="24" title="Telegram">](https://telegram.org)
+## Что покрыто
 
-- **Playwright** – современный фреймворк для автоматизации тестирования 
-- **JavaScript** – язык написания тестов 
-- **GitHub Actions** – CI/CD для автоматического запуска тестов
-- **Jenkins** – альтернативная система непрерывной интеграции с гибкой настройкой пайплайнов  
-- **Allure Report** – система отчетности с визуализацией шагов теста  
-- **Allure TestOps** – централизованная платформа для управления тест-кейсами и аналитики  
-- **Telegram Bot** – система нотификаций о результатах прогона тестов  
+| Набор | Стенд | Тестов | Что проверяется |
+| --- | --- | --- | --- |
+| UI · `tests/conduit.spec.js` | [realworld.qa.guru](https://realworld.qa.guru/) | 3 | регистрация нового пользователя в `beforeEach`, публикация статьи, комментарий, лайк |
+| UI · `tests/academybugs.spec.js` | [academybugs.com](https://academybugs.com/find-bugs/) | 5 | воспроизведение известных багов стенда: краш при смене количества товаров и валюты, съехавшее фото товара, кнопка «Домой», 404 на странице производителя |
+| API · `tests/api.spec.js` | [apichallenges.herokuapp.com](https://apichallenges.herokuapp.com/) | 29 | методы GET, HEAD, POST, PUT, DELETE, OPTIONS; коды 200, 201, 400, 404, 406, 413; валидация полей и длины, ответы в XML и JSON |
 
+## Стек
 
-## Установка и запуск
+Playwright 1.52 · JavaScript (ES-модули) · @faker-js/faker · Allure Report (allure-playwright) · GitHub Actions · Jenkins · Allure TestOps · Telegram-бот
 
-1. **Клонировать репозиторий**
-   ```bash
-   git clone https://github.com/QASvetlana/JavaScript-Playwright-project.git
-   cd JavaScript-Playwright-project
-   ```
-2. **Установить зависимости**
-   ```bash
-   npm install
-     ```
-3. **Локальный запуск всех тестов**
-   ```bash
-   npm t
-     ```
+## Структура
 
-#### Запуск автотестов с помощью Github Actions
-<img src="src/images/github actions.png" width="690" height="370"/></a>
+```
+src/
+  pages/conduit/        Page Object для realworld.qa.guru
+  pages/academybugs/    Page Object для academybugs + общий объект App
+  service/              сервисный слой API: challenger, challenges, todos, todo
+  helpers/builder/      билдеры тестовых данных на faker: пользователь, статья
+  helpers/fixtures/     фикстура app для academybugs (test.extend)
+tests/                  спеки: conduit, academybugs, api
+.github/workflows/      CI: прогон, Allure в GitHub Pages, уведомление в Telegram
+```
 
-#### Отчет о тестировании формируется с помощью allure
-[Ссылка на отчет](https://qasvetlana.github.io/JavaScript-Playwright-project/)
+Приёмы, на которые стоит посмотреть:
 
-<img src="src/images/allure.png" width="690" height="370"/></a>
+- в academybugs тесты получают страницы через общий объект `App` из фикстуры, а не создают page object в каждом тесте;
+- API-тесты не собирают запросы руками — это делает сервисный слой;
+- данные собираются билдером: `new UserBuilder().addEmail().addUsername().addPassword(11).generate()`;
+- токен челленджера получается один раз в `beforeAll`;
+- у API-тестов теги по методу и номеру задания: `@GET`, `@POST`, `@id_9`;
+- ретраи и trace включаются только в CI: `retries: 2`, `trace: 'on-first-retry'`.
 
-<img src="src/images/allure2.png" width="690" height="370"/></a>
+## Как запустить
 
-#### Отчет о прохождении автотестов приходит в Telegram
-<img src="src/images/telegram.jpg" width="270" height="480"/></a>
+Нужен Node.js 18 или новее.
 
-#### Альтернативный запуск автотестов с помощью Jenkins
-<img src="src/images/Jenkins.png" width="690" height="370"/></a>
+```bash
+git clone https://github.com/QASvetlana/JavaScript-Playwright-project.git
+cd JavaScript-Playwright-project
+npm ci
+npx playwright install chromium
+```
 
-#### Настроена интеграция с Allure TestOps
-<img src="src/images/Testops.png" width="690" height="270"/></a>
-<img src="src/images/Testops1.png" width="690" height="370"/></a>
-   
+```bash
+npm test                               # все тесты
+npx playwright test tests/api.spec.js  # только API
+npx playwright test --grep @POST       # по тегу
+npm run testui                         # UI-режим Playwright
+```
 
+Тесты ходят на внешние стенды, поэтому нужен интернет.
 
+## Отчёты
 
+```bash
+npm run reportAwesome   # Allure 3, отчёт одним HTML-файлом
+npm run reportClassic   # классический вид Allure
+```
 
+[Allure-отчёт прогона в CI](https://qasvetlana.github.io/JavaScript-Playwright-project/) — публикуется в GitHub Pages вместе с историей запусков.
 
+<img src="src/images/allure.png" width="690" alt="Allure-отчёт">
 
+<img src="src/images/allure2.png" width="690" alt="Шаги теста в Allure">
 
+## CI
+
+Workflow «pw tests with allure» запускается вручную: **Actions → pw tests with allure → Run workflow**. Он ставит зависимости и браузеры, гоняет тесты, публикует Allure-отчёт в GitHub Pages и отправляет сводку в Telegram. Для Telegram нужны секреты `TELEGRAM_BOT_TOKEN` и `TELEGRAM_CHAT_ID`.
+
+<img src="src/images/github actions.png" width="690" alt="Запуск в GitHub Actions">
+
+Сводка прогона в Telegram:
+
+<img src="src/images/telegram.jpg" width="270" alt="Уведомление в Telegram">
+
+Альтернативный запуск в Jenkins:
+
+<img src="src/images/Jenkins.png" width="690" alt="Jenkins">
+
+Интеграция с Allure TestOps:
+
+<img src="src/images/Testops.png" width="690" alt="Allure TestOps">
+<img src="src/images/Testops1.png" width="690" alt="Allure TestOps, тест-кейсы">
