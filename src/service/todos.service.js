@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 
-const URL = "https://apichallenges.herokuapp.com/";
+import { API_URL } from "./config";
 
 export class ToDosService {
   constructor(request) {
@@ -8,28 +8,28 @@ export class ToDosService {
   }
 
   async get(token) {
-    const response = await this.request.get(`${URL}todos`, {
+    const response = await this.request.get(`${API_URL}todos`, {
       headers: { "x-challenger": token },
     });
     return response;
   }
 
   async getWithId(token) {
-    const response = await this.request.get(`${URL}todos/2`, {
+    const response = await this.request.get(`${API_URL}todos/2`, {
       headers: { "x-challenger": token },
     });
     return response;
   }
 
   async getWithNonExistentId(token) {
-    const response = await this.request.get(`${URL}todos/20`, {
+    const response = await this.request.get(`${API_URL}todos/20`, {
       headers: { "x-challenger": token },
     });
     return response;
   }
 
   async postWithDoneStatuseTrue(token) {
-    const response = await this.request.post(`${URL}todos`, {
+    const response = await this.request.post(`${API_URL}todos`, {
       headers: { 'x-challenger': token },
       data: { title: 'Done', doneStatus: true }
     });
@@ -37,7 +37,7 @@ export class ToDosService {
   }
 
   async postWithDoneStatuseFalse(token) {
-    const response = await this.request.post(`${URL}todos`, {
+    const response = await this.request.post(`${API_URL}todos`, {
       headers: { 'x-challenger': token },
       data: { title: 'Done', doneStatus: false }
     });
@@ -45,14 +45,14 @@ export class ToDosService {
   }
 
   async head(token) {
-    const response = await this.request.head(`${URL}todos`, {
+    const response = await this.request.head(`${API_URL}todos`, {
       headers: { 'x-challenger': token }
     });
     return response;
   }
   
   async post(token) {
-    const response = await this.request.post(`${URL}todos`, {
+    const response = await this.request.post(`${API_URL}todos`, {
       headers: { "x-challenger": token },
       data: { title: 'Done', doneStatus: true }
     });
@@ -60,7 +60,7 @@ export class ToDosService {
   }
 
   async postWrongDoneStatus(token) {
-    const response = await this.request.post(`${URL}todos`, {
+    const response = await this.request.post(`${API_URL}todos`, {
       headers: { "x-challenger": token },
       data: { title: 'Done', doneStatus: "some string" }
     });
@@ -69,7 +69,7 @@ export class ToDosService {
 
   async postTitleToLong(token) {
     let titleText = faker.string.alpha({ length: 51 });
-    let response = await this.request.post(`${URL}todos`, {
+    let response = await this.request.post(`${API_URL}todos`, {
       headers: { "x-challenger": token },
       data: { title: titleText } 
     });
@@ -78,7 +78,7 @@ export class ToDosService {
 
   async postDescriptionToLong(token) {
     let descriptionText = faker.string.alpha({ length: 201 });
-    let response = await this.request.post(`${URL}todos`, {
+    let response = await this.request.post(`${API_URL}todos`, {
       headers: { "x-challenger": token },
       data: { title: "some text", description: descriptionText } 
     });
@@ -88,7 +88,7 @@ export class ToDosService {
   async postMaxContent(token) {
     let titleMaxText = faker.string.alpha({ length: 50 });
     let descriptionMaxText = faker.string.alpha({ length: 200 });
-    let response = await this.request.post(`${URL}todos`, {
+    let response = await this.request.post(`${API_URL}todos`, {
       headers: { "x-challenger": token },
       data: { title: titleMaxText, description: descriptionMaxText } 
     });
@@ -97,7 +97,7 @@ export class ToDosService {
 
   async postTooLongContent(token) {
     let descriptionMaxText = faker.string.alpha({ length: 5005 });
-    let response = await this.request.post(`${URL}todos`, {
+    let response = await this.request.post(`${API_URL}todos`, {
       headers: { "x-challenger": token },
       data: { description: descriptionMaxText } 
     });
@@ -105,7 +105,7 @@ export class ToDosService {
   }
 
   async postWrongFieldInData(token) {
-    let response = await this.request.post(`${URL}todos`, {
+    let response = await this.request.post(`${API_URL}todos`, {
       headers: { "x-challenger": token },
       data: { title: "a title", priority: "extra" } 
     });
@@ -113,7 +113,7 @@ export class ToDosService {
   }
 
   async putWrong(token) {
-    let response = await this.request.put(`${URL}todos/111`, {
+    let response = await this.request.put(`${API_URL}todos/111`, {
       headers: { "x-challenger": token },
       data: { title: "a title" } 
     });
@@ -121,7 +121,7 @@ export class ToDosService {
   }
 
   async postWithNewTitleCorrectID(token) {
-    const response = await this.request.post(`${URL}todos/2`, {
+    const response = await this.request.post(`${API_URL}todos/2`, {
       headers: { "x-challenger": token },
       data: { title: "new title" }
     });
@@ -129,7 +129,7 @@ export class ToDosService {
   }
 
   async postWithNewTitleIncorrectID(token) {
-    const response = await this.request.post(`${URL}todos/111`, {
+    const response = await this.request.post(`${API_URL}todos/111`, {
       headers: { "x-challenger": token },
       data: { title: "new title" }
     });
@@ -137,7 +137,7 @@ export class ToDosService {
   }
 
   async put(token) {
-    let response = await this.request.put(`${URL}todos/2`, {
+    let response = await this.request.put(`${API_URL}todos/2`, {
       headers: { "x-challenger": token },
       data: { 
         title: "updated title", 
@@ -149,7 +149,7 @@ export class ToDosService {
   }
 
   async putPartialUpdate(token) {
-    let response = await this.request.put(`${URL}todos/2`, {
+    let response = await this.request.put(`${API_URL}todos/2`, {
       headers: { "x-challenger": token },
       data: { title: "partial update for title" } 
     });
@@ -157,7 +157,7 @@ export class ToDosService {
   }
 
   async putWithoutTitle(token) {
-    let response = await this.request.put(`${URL}todos/2`, {
+    let response = await this.request.put(`${API_URL}todos/2`, {
       headers: { "x-challenger": token },
       data: {
         id: 2,
@@ -169,7 +169,7 @@ export class ToDosService {
   }
 
   async putDifferentId(token) {
-    let response = await this.request.put(`${URL}todos/2`, {
+    let response = await this.request.put(`${API_URL}todos/2`, {
       headers: { "x-challenger": token },
       data: {
         id: 3,
@@ -182,14 +182,14 @@ export class ToDosService {
   }
 
   async delete(token) {
-    let response = await this.request.delete(`${URL}todos/2`, {
+    let response = await this.request.delete(`${API_URL}todos/2`, {
       headers: { "x-challenger": token },
     });
     return response;
   }
 
   async options(token) {
-    const response = await this.request.fetch(`${URL}todos`, {
+    const response = await this.request.fetch(`${API_URL}todos`, {
       method: 'OPTIONS',
       headers: { "x-challenger": token }
     });
@@ -197,7 +197,7 @@ export class ToDosService {
   }
 
   async getWithXml(token) {
-    const response = await this.request.get(`${URL}todos`, {
+    const response = await this.request.get(`${API_URL}todos`, {
       headers: { 
         'x-challenger': token, 
         'Accept': 'application/xml' 
@@ -207,7 +207,7 @@ export class ToDosService {
   }
 
   async getWithJSON(token) {
-    const response = await this.request.get(`${URL}todos`, {
+    const response = await this.request.get(`${API_URL}todos`, {
       headers: { 
         'x-challenger': token, 
         'Accept': 'application/json' 
@@ -217,7 +217,7 @@ export class ToDosService {
   }
 
   async getWithAny(token) {
-    const response = await this.request.get(`${URL}todos`, {
+    const response = await this.request.get(`${API_URL}todos`, {
       headers: { 
         'x-challenger': token, 
         'Accept': '*/*' 
@@ -227,7 +227,7 @@ export class ToDosService {
   }
 
   async getWithPref(token) {
-    const response = await this.request.get(`${URL}todos`, {
+    const response = await this.request.get(`${API_URL}todos`, {
       headers: { 
         'x-challenger': token, 
         'Accept': 'application/xml, application/json'
@@ -237,7 +237,7 @@ export class ToDosService {
   }
 
   async getWithoutAccept(token) {
-    const response = await this.request.get(`${URL}todos`, {
+    const response = await this.request.get(`${API_URL}todos`, {
       headers: { 
         'x-challenger': token, 
         'Accept': ''
@@ -247,7 +247,7 @@ export class ToDosService {
   }
 
   async getWithAcceptGzip(token) {
-    const response = await this.request.get(`${URL}todos`, {
+    const response = await this.request.get(`${API_URL}todos`, {
       headers: { 
         'x-challenger': token, 
         'Accept': 'application/gzip'  

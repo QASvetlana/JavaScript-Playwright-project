@@ -13,7 +13,7 @@
 | --- | --- | --- | --- |
 | UI · `tests/conduit.spec.js` | [realworld.qa.guru](https://realworld.qa.guru/) | 3 | регистрация нового пользователя в `beforeEach`, публикация статьи, комментарий, лайк |
 | UI · `tests/academybugs.spec.js` | [academybugs.com](https://academybugs.com/find-bugs/) | 5 | воспроизведение известных багов стенда: краш при смене количества товаров и валюты, съехавшее фото товара, кнопка «Домой», 404 на странице производителя |
-| API · `tests/api.spec.js` | [apichallenges.herokuapp.com](https://apichallenges.herokuapp.com/) | 29 | методы GET, HEAD, POST, PUT, DELETE, OPTIONS; коды 200, 201, 400, 404, 406, 413; валидация полей и длины, ответы в XML и JSON |
+| API · `tests/api.spec.js` | [apichallenges.com](https://apichallenges.com/) | 29 | методы GET, HEAD, POST, PUT, DELETE, OPTIONS; коды 200, 201, 204, 404, 406, 413, 422; валидация полей и длины, ответы в XML и JSON |
 
 ## Стек
 
@@ -26,6 +26,7 @@ src/
   pages/conduit/        Page Object для realworld.qa.guru
   pages/academybugs/    Page Object для academybugs + общий объект App
   service/              сервисный слой API: challenger, challenges, todos, todo
+  service/config.js     адрес API-стенда, переопределяется переменной API_URL
   helpers/builder/      билдеры тестовых данных на faker: пользователь, статья
   helpers/fixtures/     фикстура app для academybugs (test.extend)
 tests/                  спеки: conduit, academybugs, api
@@ -59,7 +60,7 @@ npx playwright test --grep @POST       # по тегу
 npm run testui                         # UI-режим Playwright
 ```
 
-Тесты ходят на внешние стенды, поэтому нужен интернет.
+Тесты ходят на внешние стенды, поэтому нужен интернет. Адрес API-стенда задан в одном месте — `src/service/config.js`; запустить на другом адресе: `API_URL=https://... npm test`.
 
 ## Отчёты
 
