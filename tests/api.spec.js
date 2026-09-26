@@ -120,7 +120,7 @@ test.describe("API challenge", () => {
     expect(response.status()).toBe(413);
     expect(body).toEqual({
       errorMessages: [
-        'Error: Request body too large, max allowed is 5000 bytes'
+        'Error: request body too large, max allowed is 5000 bytes'
       ]
     });
   });
@@ -132,7 +132,7 @@ test.describe("API challenge", () => {
     expect(response.status()).toBe(422);
     expect(body).toEqual({
       errorMessages: [
-        'Could not find field: priority'
+        'Failed Validation: Could not find field: priority'
       ]
     });
   });
@@ -194,7 +194,7 @@ test.describe("API challenge", () => {
     expect(response.status()).toBe(422);
     expect(body).toEqual({
       errorMessages: [
-        'title : field is mandatory'
+        'Failed Validation: title : field is mandatory'
       ]
     });
   });

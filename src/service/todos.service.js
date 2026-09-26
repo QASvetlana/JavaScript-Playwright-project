@@ -112,10 +112,12 @@ export class ToDosService {
     return response;
   }
 
+  // Создать todo через PUT нельзя: id генерирует сервер, поэтому свой id в теле даёт 422.
+  // Без id в теле тот же запрос вернёт 404 — это уже другое задание (39).
   async putWrong(token) {
     let response = await this.request.put(`${API_URL}todos/111`, {
       headers: { "x-challenger": token },
-      data: { title: "a title" } 
+      data: { id: 111, title: "a title", doneStatus: false, description: "some description" }
     });
     return response;
   }
